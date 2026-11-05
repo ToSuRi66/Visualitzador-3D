@@ -44,17 +44,14 @@ scene.add(dirLight2)
 // --- TEXTURAS ---
 const textureLoader = new THREE.TextureLoader()
 
-// Texturas del tronco (mossybark02)
-const barkColor = textureLoader.load('/mossybark02.png')
-const barkNormal = textureLoader.load('/mossybark02_normal.png')
+// Texturas del tronco
+const barkColor = textureLoader.load(import.meta.env.BASE_URL + 'mossybark02.png')
+const barkNormal = textureLoader.load(import.meta.env.BASE_URL + 'mossybark02_normal.png')
 
-// Configuración de repetición (tiling) para evitar que la textura se estire
 barkColor.wrapS = THREE.RepeatWrapping
 barkColor.wrapT = THREE.RepeatWrapping
 barkNormal.wrapS = THREE.RepeatWrapping
 barkNormal.wrapT = THREE.RepeatWrapping
-
-// Ajuste de repetición: (horizontal, vertical). Sube o baja el segundo valor si necesitas más o menos densidad
 barkColor.repeat.set(2, 6)
 barkNormal.repeat.set(2, 6)
 
@@ -64,29 +61,28 @@ const barkMaterial = new THREE.MeshStandardMaterial({
     roughness: 0.9,
 })
 
-// Texturas de las hojas/ramas (branch05)
-const branchColor = textureLoader.load('/branch05.png')
-const branchNormal = textureLoader.load('/branch05_normal.png')
-const branchRoughness = textureLoader.load('/branch05_roughness.png')
+// Texturas de las hojas/ramas
+const branchColor = textureLoader.load(import.meta.env.BASE_URL + 'branch05.png')
+const branchNormal = textureLoader.load(import.meta.env.BASE_URL + 'branch05_normal.png')
+const branchRoughness = textureLoader.load(import.meta.env.BASE_URL + 'branch05_roughness.png')
 
 const branchMaterial = new THREE.MeshStandardMaterial({
     map: branchColor,
     normalMap: branchNormal,
     roughnessMap: branchRoughness,
-    alphaTest: 0.00005,         // Umbral bajo para no recortar hojas finas
+    alphaTest: 0.1,
     transparent: true,
-    side: THREE.DoubleSide, // Visible por ambos lados
+    side: THREE.DoubleSide,
     depthWrite: true,
 })
 
-// 4. Cargador de modelos OBJ
+// --- CARGADOR DE MODELOS OBJ ---
 const loader = new OBJLoader()
 loader.load(
-    '/model.obj',
+    import.meta.env.BASE_URL + 'model.obj',
     (object) => {
         object.traverse((child) => {
             if (child.isMesh) {
-                // En tu modelo, 'tree' corresponde al follaje y las subdivisiones al tronco/ramas
                 if (child.name === 'tree') {
                     child.material = branchMaterial
                 } else {
@@ -99,11 +95,7 @@ loader.load(
         scene.add(object)
         console.log('Modelo cargado correctamente:', object)
     },
-    (xhr) => {
-        if (xhr.total > 0) {
-            console.log(`${Math.round((xhr.loaded / xhr.total) * 100)}% cargado`)
-        }
-    },
+    undefined,
     (error) => {
         console.error('Error al cargar el modelo OBJ:', error)
     }
